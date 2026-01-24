@@ -2,255 +2,497 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>❄雪花飘落动画❄</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>雪花飘落动画效果</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(to bottom, #0c0c2e, #1a1a40);
-            color: white; 
-            font-family: 'Microsoft YaHei', sans-serif;
-            overflow: hidden; 
-            height: 100vh;
-            -webkit-user-select: none;
-            user-select: none;
+            color: #e6f2ff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
-        canvas { 
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-        }
-        .title {
-            position: absolute;
-            top: 20px;
-            left: 0;
+        
+        .container {
+            max-width: 1000px;
             width: 100%;
             text-align: center;
-            color: #87ceeb;
-            font-size: 28px;
-            text-shadow: 0 0 20px rgba(135, 206, 235, 0.8);
-            z-index: 100;
-            padding: 0 15px;
+            z-index: 10;
+            position: relative;
         }
-        .info {
-            position: absolute;
-            bottom: 20px;
-            left: 0;
-            width: 100%;
-            text-align: center;
-            color: #a3d5ff;
-            font-size: 16px;
-            z-index: 100;
-            padding: 0 15px;
+        
+        header {
+            margin-bottom: 40px;
+            padding: 20px;
+            background: rgba(10, 15, 60, 0.7);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 10, 80, 0.5);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(100, 150, 255, 0.2);
         }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #87ceeb, #ffffff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 15px rgba(135, 206, 235, 0.5);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+            opacity: 0.9;
+        }
+        
         .controls {
-            position: absolute;
-            top: 80px;
-            left: 0;
-            width: 100%;
-            text-align: center;
-            z-index: 100;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(15, 20, 70, 0.6);
+            border-radius: 15px;
         }
-        button {
-            padding: 10px 20px;
-            margin: 5px;
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 150px;
+        }
+        
+        .control-label {
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #a3d5ff;
+        }
+        
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+        }
+        
+        input[type="range"] {
+            flex-grow: 1;
+            height: 8px;
+            -webkit-appearance: none;
+            background: rgba(100, 150, 255, 0.2);
+            border-radius: 4px;
+            outline: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
             background: #4da6ff;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(77, 166, 255, 0.8);
+        }
+        
+        .value-display {
+            min-width: 40px;
+            text-align: center;
+            font-weight: bold;
+            color: #4da6ff;
+        }
+        
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 12px 25px;
+            font-size: 1rem;
+            background: linear-gradient(to right, #2b6cb0, #4da6ff);
             color: white;
             border: none;
-            border-radius: 25px;
-            font-size: 16px;
+            border-radius: 50px;
             cursor: pointer;
-            box-shadow: 0 0 15px rgba(77, 166, 255, 0.6);
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 50, 150, 0.4);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 80, 200, 0.6);
+            background: linear-gradient(to right, #3182ce, #63b3ed);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        .snowflakes-count {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(10, 15, 60, 0.8);
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            color: #4da6ff;
+            z-index: 100;
+            border: 1px solid rgba(100, 150, 255, 0.3);
+        }
+        
+        footer {
+            margin-top: 40px;
+            padding: 20px;
+            color: #88bfff;
+            font-size: 0.9rem;
+            text-align: center;
+            opacity: 0.8;
+        }
+        
+        /* 雪花容器 */
+        #snow-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .control-group {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .buttons {
+                flex-wrap: wrap;
+            }
+            
+            .snowflakes-count {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin-bottom: 20px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="title">❄ 雪花飘落动画 ❄</div>
+    <div id="snow-container"></div>
     
-    <div class="controls">
-        <button onclick="addSnow()">更多雪花</button>
-        <button onclick="changeSpeed()">改变速度</button>
-        <button onclick="shareWeChat()">分享到微信</button>
+    <div class="snowflakes-count">
+        <i class="fas fa-snowflake"></i> 雪花数量: <span id="count">150</span>
     </div>
     
-    <canvas id="snowCanvas"></canvas>
-    
-    <div class="info">专为GitHub Pages优化 | 微信可直接分享</div>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-snowflake"></i> 雪花飘落动画</h1>
+            <p class="subtitle">使用HTML、CSS和JavaScript创建的交互式雪花效果</p>
+        </header>
+        
+        <div class="controls">
+            <div class="control-group">
+                <div class="control-label">雪花数量</div>
+                <div class="slider-container">
+                    <input type="range" id="snowCount" min="20" max="500" value="150" step="10">
+                    <span class="value-display" id="countValue">150</span>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <div class="control-label">飘落速度</div>
+                <div class="slider-container">
+                    <input type="range" id="snowSpeed" min="1" max="10" value="5" step="0.5">
+                    <span class="value-display" id="speedValue">5</span>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <div class="control-label">雪花大小</div>
+                <div class="slider-container">
+                    <input type="range" id="snowSize" min="1" max="15" value="5" step="0.5">
+                    <span class="value-display" id="sizeValue">5</span>
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <button id="playPause"><i class="fas fa-pause"></i> 暂停动画</button>
+                <button id="resetBtn"><i class="fas fa-redo"></i> 重置设置</button>
+                <button id="stormBtn"><i class="fas fa-wind"></i> 暴风雪模式</button>
+            </div>
+        </div>
+        
+        <footer>
+            <p>雪花飘落动画效果 | 使用HTML、CSS和JavaScript实现</p>
+        </footer>
+    </div>
 
     <script>
-        // 微信检测
-        const isWeChat = /MicroMessenger/i.test(navigator.userAgent);
-        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        
-        // 微信提示
-        if (isWeChat) {
-            setTimeout(() => {
-                alert('❄ 雪花动画加载成功！\n\n点击右上角"..."分享给好友\n选择"在浏览器打开"更流畅');
-            }, 1000);
-        }
-        
-        // 防止微信下拉刷新
-        if (isWeChat) {
-            document.addEventListener('touchmove', function(e) {
-                e.preventDefault();
-            }, { passive: false });
-        }
-        
-        // Canvas初始化
-        const canvas = document.getElementById('snowCanvas');
-        const ctx = canvas.getContext('2d');
-        
-        // 设置画布大小
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+        // 获取DOM元素
+        const snowContainer = document.getElementById('snow-container');
+        const snowCountSlider = document.getElementById('snowCount');
+        const snowSpeedSlider = document.getElementById('snowSpeed');
+        const snowSizeSlider = document.getElementById('snowSize');
+        const countValue = document.getElementById('countValue');
+        const speedValue = document.getElementById('speedValue');
+        const sizeValue = document.getElementById('sizeValue');
+        const playPauseBtn = document.getElementById('playPause');
+        const resetBtn = document.getElementById('resetBtn');
+        const stormBtn = document.getElementById('stormBtn');
+        const countDisplay = document.getElementById('count');
         
         // 雪花数组
         let snowflakes = [];
+        let animationId = null;
+        let isPlaying = true;
         
-        // 雪花类
-        class Snowflake {
-            constructor() {
-                this.reset();
-                // 随机初始位置
-                this.y = Math.random() * canvas.height;
-            }
-            
-            reset() {
-                this.x = Math.random() * canvas.width;
-                this.y = -20;
-                this.size = Math.random() * (isMobile ? 3 : 5) + 1;
-                this.speed = Math.random() * (isMobile ? 1.5 : 2.5) + 0.5;
-                this.wind = Math.random() * 0.8 - 0.4;
-                this.opacity = Math.random() * 0.7 + 0.3;
-                this.wobble = Math.random() * Math.PI * 2;
-                this.wobbleSpeed = Math.random() * 0.03 + 0.01;
-            }
-            
-            update() {
-                this.y += this.speed;
-                this.wobble += this.wobbleSpeed;
-                this.x += Math.sin(this.wobble) * this.wind;
-                
-                // 如果雪花飘出屏幕，重置
-                if (this.y > canvas.height + 10) {
-                    this.reset();
-                }
-            }
-            
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
-                ctx.fill();
-                
-                // 添加雪花闪光效果
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size * 0.4, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-                ctx.fill();
-            }
-        }
+        // 当前设置
+        let settings = {
+            count: 150,
+            speed: 5,
+            size: 5
+        };
         
         // 初始化雪花
-        function initSnowflakes(count) {
+        function initSnowflakes() {
+            // 清除现有的雪花
+            snowflakes.forEach(flake => {
+                if (flake.element) {
+                    snowContainer.removeChild(flake.element);
+                }
+            });
+            
             snowflakes = [];
-            // 移动设备减少雪花数量
-            const flakeCount = isMobile ? Math.min(count, 60) : count;
-            for (let i = 0; i < flakeCount; i++) {
-                snowflakes.push(new Snowflake());
+            
+            // 创建新的雪花
+            for (let i = 0; i < settings.count; i++) {
+                createSnowflake();
+            }
+            
+            countDisplay.textContent = settings.count;
+            
+            // 如果动画正在运行，继续运行动画
+            if (isPlaying) {
+                startAnimation();
             }
         }
         
-        // 动画循环
-        function animate() {
-            // 清空画布
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // 创建单个雪花
+        function createSnowflake() {
+            const snowflake = document.createElement('div');
+            snowflake.innerHTML = '❄';
+            snowflake.style.position = 'absolute';
+            snowflake.style.userSelect = 'none';
+            snowflake.style.pointerEvents = 'none';
             
-            // 绘制渐变背景
-            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            gradient.addColorStop(0, '#0c0c2e');
-            gradient.addColorStop(1, '#1a1a40');
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            // 随机属性
+            const size = Math.random() * settings.size + 1;
+            const speed = Math.random() * settings.speed + 1;
+            const startX = Math.random() * window.innerWidth;
+            const startY = -20;
+            const swayAmount = Math.random() * 50 + 20; // 左右摇摆幅度
+            const swaySpeed = Math.random() * 0.03 + 0.01; // 摇摆速度
             
-            // 更新和绘制所有雪花
+            snowflake.style.fontSize = `${size}px`;
+            snowflake.style.opacity = Math.random() * 0.7 + 0.3;
+            snowflake.style.left = `${startX}px`;
+            snowflake.style.top = `${startY}px`;
+            snowflake.style.color = `rgba(255, 255, 255, ${Math.random() * 0.5 + 0.5})`;
+            
+            snowContainer.appendChild(snowflake);
+            
+            // 保存雪花数据
+            snowflakes.push({
+                element: snowflake,
+                x: startX,
+                y: startY,
+                speed: speed,
+                size: size,
+                swayAmount: swayAmount,
+                swaySpeed: swaySpeed,
+                sway: Math.random() * Math.PI * 2, // 随机起始摇摆角度
+                rotate: Math.random() * 360
+            });
+        }
+        
+        // 动画函数
+        function animateSnowflakes() {
             snowflakes.forEach(flake => {
-                flake.update();
-                flake.draw();
+                // 更新位置
+                flake.y += flake.speed;
+                flake.sway += flake.swaySpeed;
+                flake.rotate += flake.speed * 0.5;
+                
+                // 计算左右摇摆
+                const swayX = Math.sin(flake.sway) * flake.swayAmount;
+                
+                // 如果雪花飘出底部，重置到顶部
+                if (flake.y > window.innerHeight) {
+                    flake.y = -20;
+                    flake.x = Math.random() * window.innerWidth;
+                }
+                
+                // 应用变换
+                flake.element.style.transform = `translate(${swayX}px, ${flake.y}px) rotate(${flake.rotate}deg)`;
             });
             
-            requestAnimationFrame(animate);
-        }
-        
-        // 控制函数
-        function addSnow() {
-            // 添加更多雪花
-            for (let i = 0; i < 20; i++) {
-                snowflakes.push(new Snowflake());
+            // 继续动画
+            if (isPlaying) {
+                animationId = requestAnimationFrame(animateSnowflakes);
             }
-        }
-        
-        function changeSpeed() {
-            // 改变所有雪花速度
-            snowflakes.forEach(flake => {
-                flake.speed = Math.random() * 3 + 1;
-            });
-        }
-        
-        function shareWeChat() {
-            const url = window.location.href;
-            if (isWeChat) {
-                alert('点击右上角"···"分享给朋友\n链接已复制');
-            } else {
-                alert('复制链接分享给好友：\n' + url);
-            }
-            // 尝试复制到剪贴板
-            navigator.clipboard.writeText(url).then(() => {
-                console.log('链接已复制');
-            });
         }
         
         // 开始动画
-        initSnowflakes(isMobile ? 50 : 80);
-        animate();
+        function startAnimation() {
+            if (!animationId) {
+                animationId = requestAnimationFrame(animateSnowflakes);
+            }
+        }
         
-        // 鼠标/触摸交互
-        let isMouseDown = false;
-        canvas.addEventListener('mousedown', () => isMouseDown = true);
-        canvas.addEventListener('mouseup', () => isMouseDown = false);
-        canvas.addEventListener('mousemove', (e) => {
-            if (isMouseDown) {
-                // 鼠标拖动时添加雪花
-                for (let i = 0; i < 5; i++) {
-                    const flake = new Snowflake();
-                    flake.x = e.clientX + Math.random() * 50 - 25;
-                    flake.y = e.clientY + Math.random() * 50 - 25;
-                    snowflakes.push(flake);
-                }
+        // 暂停动画
+        function pauseAnimation() {
+            isPlaying = false;
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+                animationId = null;
+            }
+        }
+        
+        // 更新滑块显示
+        function updateSliderDisplays() {
+            countValue.textContent = settings.count;
+            speedValue.textContent = settings.speed;
+            sizeValue.textContent = settings.size;
+        }
+        
+        // 重置设置
+        function resetSettings() {
+            settings.count = 150;
+            settings.speed = 5;
+            settings.size = 5;
+            
+            snowCountSlider.value = settings.count;
+            snowSpeedSlider.value = settings.speed;
+            snowSizeSlider.value = settings.size;
+            
+            updateSliderDisplays();
+            initSnowflakes();
+        }
+        
+        // 暴风雪模式
+        function stormMode() {
+            settings.count = 400;
+            settings.speed = 8;
+            settings.size = 7;
+            
+            snowCountSlider.value = settings.count;
+            snowSpeedSlider.value = settings.speed;
+            snowSizeSlider.value = settings.size;
+            
+            updateSliderDisplays();
+            initSnowflakes();
+            
+            // 3秒后恢复
+            setTimeout(() => {
+                settings.count = 150;
+                settings.speed = 5;
+                settings.size = 5;
+                
+                snowCountSlider.value = settings.count;
+                snowSpeedSlider.value = settings.speed;
+                snowSizeSlider.value = settings.size;
+                
+                updateSliderDisplays();
+                initSnowflakes();
+            }, 3000);
+        }
+        
+        // 事件监听器
+        snowCountSlider.addEventListener('input', function() {
+            settings.count = parseInt(this.value);
+            countValue.textContent = settings.count;
+            initSnowflakes();
+        });
+        
+        snowSpeedSlider.addEventListener('input', function() {
+            settings.speed = parseFloat(this.value);
+            speedValue.textContent = settings.speed;
+            
+            // 更新雪花速度
+            snowflakes.forEach(flake => {
+                const speedMultiplier = flake.speed / (settings.speed - 1); // 保持相对速度比例
+                flake.speed = speedMultiplier * settings.speed;
+            });
+        });
+        
+        snowSizeSlider.addEventListener('input', function() {
+            settings.size = parseFloat(this.value);
+            sizeValue.textContent = settings.size;
+            
+            // 更新雪花大小
+            snowflakes.forEach(flake => {
+                const sizeMultiplier = flake.size / (settings.size - 1); // 保持相对大小比例
+                flake.size = sizeMultiplier * settings.size;
+                flake.element.style.fontSize = `${flake.size}px`;
+            });
+        });
+        
+        playPauseBtn.addEventListener('click', function() {
+            isPlaying = !isPlaying;
+            
+            if (isPlaying) {
+                startAnimation();
+                this.innerHTML = '<i class="fas fa-pause"></i> 暂停动画';
+            } else {
+                pauseAnimation();
+                this.innerHTML = '<i class="fas fa-play"></i> 继续动画';
             }
         });
         
-        // 触摸交互（移动设备）
-        canvas.addEventListener('touchstart', () => isMouseDown = true);
-        canvas.addEventListener('touchend', () => isMouseDown = false);
-        canvas.addEventListener('touchmove', (e) => {
-            e.preventDefault();
-            if (isMouseDown) {
-                const touch = e.touches[0];
-                for (let i = 0; i < 3; i++) {
-                    const flake = new Snowflake();
-                    flake.x = touch.clientX + Math.random() * 40 - 20;
-                    flake.y = touch.clientY + Math.random() * 40 - 20;
-                    snowflakes.push(flake);
-                }
-            }
+        resetBtn.addEventListener('click', resetSettings);
+        
+        stormBtn.addEventListener('click', stormMode);
+        
+        // 窗口大小调整时重新初始化雪花
+        window.addEventListener('resize', function() {
+            initSnowflakes();
         });
+        
+        // 初始化
+        updateSliderDisplays();
+        initSnowflakes();
     </script>
 </body>
 </html>
